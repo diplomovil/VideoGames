@@ -1,10 +1,13 @@
 package com.amaurypm.videogames.view.activities
 
+import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.amaurypm.videogames.R
 import com.amaurypm.videogames.databinding.ActivityDetailsBinding
 import com.amaurypm.videogames.db.DbGames
@@ -57,6 +60,24 @@ class DetailsActivity : AppCompatActivity() {
             }
             R.id.btnDelete -> {
                 //Aquí iría el código para borrar el registro
+
+                AlertDialog.Builder(this)
+                    .setTitle("Confirmación")
+                    .setMessage("¿Realmente deseas eliminar el juego ${game?.title}?")
+                    .setPositiveButton("Aceptar", DialogInterface.OnClickListener { dialog, which ->
+                        if(dbGames.deleteGame(id)){
+                            Toast.makeText(this@DetailsActivity, "Registro eliminado exitosamente", Toast.LENGTH_SHORT).show()
+                            startActivity(Intent(this@DetailsActivity, MainActivity::class.java))
+                            finish()
+                        }else{
+                            Toast.makeText(this@DetailsActivity, "No se pudo realizar la eliminación", Toast.LENGTH_SHORT).show()
+                        }
+                    })
+                    .setNegativeButton("Cancelar", DialogInterface.OnClickListener { dialog, which ->
+                      dialog.dismiss()
+                    })
+                    .show()
+
             }
         }
     }

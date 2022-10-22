@@ -95,4 +95,22 @@ class DbGames(private val context: Context): DbHelper(context) {
         return banderaCorrecto
     }
 
+    fun deleteGame(id: Int): Boolean{
+        var banderaCorrecto = false
+
+        val dbHelper = DbHelper(context)
+        val db = dbHelper.writableDatabase
+
+        try{
+            db.execSQL("DELETE FROM GAMES WHERE id = $id")
+            banderaCorrecto = true
+        }catch(e: Exception){
+
+        }finally {
+            db.close()
+        }
+
+        return banderaCorrecto
+    }
+
 }

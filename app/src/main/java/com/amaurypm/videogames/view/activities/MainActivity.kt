@@ -44,6 +44,9 @@ class MainActivity : AppCompatActivity() {
         binding.rvGames.layoutManager = LinearLayoutManager(this)
         binding.rvGames.adapter = gamesAdapter
 
+        if(listGames.size == 0) binding.tvSinRegistros.visibility = View.VISIBLE
+        else binding.tvSinRegistros.visibility = View.INVISIBLE
+
     }
 
     fun click(view: View) {
