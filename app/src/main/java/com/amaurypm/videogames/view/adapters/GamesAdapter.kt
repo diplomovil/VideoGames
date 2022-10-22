@@ -32,6 +32,7 @@ class GamesAdapter(private val context: Context, val games: ArrayList<Game>): Re
         holder.tvGenre.text = games[position].genre
         holder.tvDeveloper.text = games[position].developer
 
+
         //Para los clicks de cada elemento viewholder
 
         holder.itemView.setOnClickListener {
