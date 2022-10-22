@@ -58,4 +58,41 @@ class DbGames(private val context: Context): DbHelper(context) {
         return listGames
     }
 
+    fun getGame(id: Int): Game?{
+        val dbHelper = DbHelper(context)
+        val db = dbHelper.writableDatabase
+
+        var game: Game? = null
+
+        var cursorGames: Cursor? = null
+
+        cursorGames = db.rawQuery("SELECT * FROM GAMES WHERE id = $id LIMIT 1", null)
+
+        if(cursorGames.moveToFirst()){
+            game = Game(cursorGames.getInt(0), cursorGames.getString(1), cursorGames.getString(2), cursorGames.getString(3))
+        }
+
+        cursorGames.close()
+
+        return game
+    }
+
+    fun updateGame(id: Int, title: String, genre: String, developer: String): Boolean{
+        var banderaCorrecto = false
+
+        val dbHelper = DbHelper(context)
+        val db = dbHelper.writableDatabase
+
+        try{
+            db.execSQL("UPDATE GAMES SET title = '$title', genre = '$genre', developer = '$developer' WHERE id = $id")
+            banderaCorrecto = true
+        }catch(e: Exception){
+            //Manejo de la excepción
+        }finally {
+            db.close()
+        }
+
+        return banderaCorrecto
+    }
+
 }
