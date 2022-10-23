@@ -5,13 +5,19 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import com.amaurypm.videogames.R
+import androidx.activity.viewModels
+import com.amaurypm.videogames.application.VideoGamesApplication
 import com.amaurypm.videogames.databinding.ActivityInsertBinding
-import com.amaurypm.videogames.db.DbGames
+import com.amaurypm.videogames.model.entities.GameEntity
+import com.amaurypm.videogames.viewmodel.GameViewModel
 
 class InsertActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityInsertBinding
+
+    private val gameViewModel: GameViewModel by viewModels() {
+        GameViewModel.GameViewModelFactory( (application as VideoGamesApplication).repository )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,7 +26,6 @@ class InsertActivity : AppCompatActivity() {
     }
 
     fun click(view: View) {
-        val dbGames = DbGames(this)
         with(binding){
             when{
                 tietTitle.text.toString().isEmpty() -> {
@@ -37,16 +42,21 @@ class InsertActivity : AppCompatActivity() {
                 }
                 else -> {
                     //Realizamos la inserción
-                    val id = dbGames.insertGame(tietTitle.text.toString(), tietGenre.text.toString(), tietDeveloper.text.toString())
+                    val game = GameEntity(
+                        title = tietTitle.text.toString(),
+                        genre = tietGenre.text.toString(),
+                        developer = tietDeveloper.text.toString()
+                    )
 
-                    if(id>0){
-                        Toast.makeText(this@InsertActivity, "Registro guardado exitosamente", Toast.LENGTH_SHORT).show()
+                    try{
+                        gameViewModel.insertGame(game)
                         tietTitle.setText("")
                         tietGenre.setText("")
                         tietDeveloper.setText("")
                         tietTitle.requestFocus()
-                    }else{
-                        Toast.makeText(this@InsertActivity, "Error al guardar el registro", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@InsertActivity, "Juego guardado exitosamente", Toast.LENGTH_SHORT).show()
+                    }catch(e: Exception){
+                        Toast.makeText(this@InsertActivity, "Error al guardar el juego", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

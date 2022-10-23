@@ -4,48 +4,44 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.Toast
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.activity.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.amaurypm.videogames.application.VideoGamesApplication
 import com.amaurypm.videogames.databinding.ActivityMainBinding
-import com.amaurypm.videogames.db.DbGames
-import com.amaurypm.videogames.db.DbHelper
-import com.amaurypm.videogames.model.Game
-import com.amaurypm.videogames.view.adapters.GamesAdapter
+import com.amaurypm.videogames.model.entities.GameEntity
+import com.amaurypm.videogames.view.adapters.GamesEntityAdapter
+import com.amaurypm.videogames.viewmodel.GameViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var listGames: ArrayList<Game>
+    private val gameViewModel: GameViewModel by viewModels() {
+        GameViewModel.GameViewModelFactory( (application as VideoGamesApplication).repository )
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-        /*
-        //Código para probar que se generó correctamente la BD
-        val dbHelper = DbHelper(this)
-        val db = dbHelper.writableDatabase
-        if(db!=null){
-            Toast.makeText(this, "La BD fue creada exitosamente", Toast.LENGTH_SHORT).show()
-        }else{
-            Toast.makeText(this, "Error al crear la BD", Toast.LENGTH_SHORT).show()
-        }*/
-
-        val dbGames = DbGames(this)
-
-        listGames = dbGames.getGames()
-
-        val gamesAdapter = GamesAdapter(this, listGames)
+        val gamesEntityAdapter = GamesEntityAdapter(this)
         binding.rvGames.layoutManager = LinearLayoutManager(this)
-        binding.rvGames.adapter = gamesAdapter
+        binding.rvGames.adapter = gamesEntityAdapter
 
-        if(listGames.size == 0) binding.tvSinRegistros.visibility = View.VISIBLE
-        else binding.tvSinRegistros.visibility = View.INVISIBLE
+        gameViewModel.allGamesList.observe(this, Observer { games->
+
+            games?.let{
+                if(games.isNotEmpty()){
+                    binding.tvSinRegistros.visibility = View.INVISIBLE
+                    gamesEntityAdapter.gamesList(games)
+                }else{
+                    binding.tvSinRegistros.visibility = View.VISIBLE
+                }
+            }
+        })
 
     }
 
@@ -54,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
-    fun selectedGame(game: Game){
+    fun selectedGameEntity(game: GameEntity){
         //Manejamos el click del elemento en el recycler view
         val intent = Intent(this, DetailsActivity::class.java)
         intent.putExtra("ID", game.id)

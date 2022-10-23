@@ -5,13 +5,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.amaurypm.videogames.databinding.ListElementBinding
-import com.amaurypm.videogames.model.Game
+import com.amaurypm.videogames.model.entities.GameEntity
 import com.amaurypm.videogames.view.activities.MainActivity
 
 /**
- * Creado por Amaury Perea Matsumura el 22/10/22
+ * Creado por Amaury Perea Matsumura el 23/10/22
  */
-class GamesAdapter(private val context: Context, val games: ArrayList<Game>): RecyclerView.Adapter<GamesAdapter.ViewHolder>(){
+class GamesEntityAdapter(private val context: Context): RecyclerView.Adapter<GamesEntityAdapter.ViewHolder>(){
+
+    private var games: List<GameEntity> = listOf()
 
     private val layoutInflater = LayoutInflater.from(context)
 
@@ -32,18 +34,22 @@ class GamesAdapter(private val context: Context, val games: ArrayList<Game>): Re
         holder.tvGenre.text = games[position].genre
         holder.tvDeveloper.text = games[position].developer
 
-
         //Para los clicks de cada elemento viewholder
 
         holder.itemView.setOnClickListener {
             //Manejar el click
-            if(context is MainActivity) context.selectedGame(games[position])
+            if(context is MainActivity) context.selectedGameEntity(games[position])
         }
 
     }
 
     override fun getItemCount(): Int {
         return games.size
+    }
+
+    fun gamesList(list: List<GameEntity>){
+        games = list
+        notifyDataSetChanged()
     }
 
 }
